@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  
+<body>
+
+<script>
+// random roll dice from 1-6
+function rollDice() {
+    return Math.floor(Math.random() * 6) + 1;
+}
+
+// input player and dice number
+const n = parseInt(prompt("Enter the number of players:"));
+const m = parseInt(prompt("Enter the number of dice for each player:"));
+
+if (isNaN(n) || isNaN(m) || n <= 1 || m <= 0) {
+    console.log("Please enter valid numeric values for n (greater than 1) and m (greater than 0).");
+} else {
+    playDiceGame(n, m);
+}
+
+function playDiceGame(players, dice) {
+    // save score and dice number of each player
+    let playerScores = new Array(players).fill(0);
+    let playerDice = new Array(players).fill(dice);
+
+    //start rounds
+    for (let round = 1; ; round++) {
+        console.log(`Turn ${round} roll the dice:`);
+
+        // the remaining players
+        let activePlayers = 0;
+
+        // save number of no.6 and no.1 of each player
+        let countSix = new Array(players).fill(0);
+        let countOne = new Array(players).fill(0);
+
+        for (let i = 0; i < players; i++) {
+            // Stop playing if it has no dice
+            if (playerDice[i] === 0) {
+                console.log(`Player #${i + 1} (${playerScores[i]}): Stop playing because it has no dice`);
+                continue;
+            }
+
+            activePlayers++;
+
+            let rolls = [];
+            for (let j = 0; j < playerDice[i]; j++) {
+                rolls.push(rollDice()); // Roll and save results
+            }
+            console.log(`Player #${i + 1} (${playerScores[i]}): ${rolls.join(',')}`);
+            
+            for (let j = 0; j < rolls.length; j++) {
+                if (rolls[j] === 6) {
+                    countSix[i]++;
+                } else if (rolls[j] === 1) {
+                    countOne[i]++;
+                }
+            }
+        }
+
+        // evaluation
+        for (let i = 0; i < players; i++) {
+            playerScores[i] += countSix[i];
+            playerDice[i] -= countSix[i];
+            let nextPlayer = (i + 1) % players;
+
+            console.log(nextPlayer);
+            while (playerDice[nextPlayer] === 0) {
+                nextPlayer = (nextPlayer + 1) % players;
+            }
+
+            playerDice[nextPlayer] += countOne[i];
+            playerDice[i] -= countOne[i];
+        }
+
+        if (activePlayers <= 1) {
+            break; // end game
+        }
+    }
+
+    // highest score
+    let maxScore = Math.max(...playerScores);
+
+    // highest score players
+    let winners = [];
+    for (let i = 0; i < playerScores.length; i++) {
+        if (playerScores[i] === maxScore) {
+            winners.push(i);
+        }
+    }
+
+    // return result
+    if (winners.length === 1) {
+        console.log(`Game won by player #${winners[0] + 1} because it has the highest score.`);
+    } else {
+        const winnerNames = winners.map(winner => `player #${winner + 1}`);
+        console.log(`Game won by ${winnerNames.join(' and ')}.`);
+    }
+
+}
+
+</script> 
+
+</body>
+</html>
